@@ -11,13 +11,18 @@
                 aria-labelledby="listbox-label"
             >
                 <span v-if="selectedOption" class="mm-flex mm-items-center">
-                    <span v-html="this.getOptionAvatar(selectedOption.value)" />
+                    <span
+                        v-if="!loading"
+                        v-html="this.getOptionAvatar(selectedOption.value)"
+                    />
+                    <Loader v-if="loading" />
                     <span v-if="showLabel" class="mm-ml-3 mm-block mm-truncate">
                         {{ selectedOption.label }}
                     </span>
                 </span>
                 <span v-else class="mm-flex mm-items-center">
-                    <span v-html="this.field.noAvatarImage" />
+                    <span v-if="!loading" v-html="this.field.noAvatarImage" />
+                    <Loader v-if="loading" />
                     <span v-if="showLabel" class="mm-ml-3 mm-block mm-truncate"
                         >No option selected</span
                     >
@@ -99,12 +104,17 @@
 </template>
 
 <script>
+import Loader from "./Loader.vue";
 import find from "lodash/find";
 // import first from 'lodash/first'
 import isNil from "lodash/isNil";
 import { DependentFormField, HandlesValidationErrors } from "laravel-nova";
 
 export default {
+    components: {
+        Loader,
+    },
+
     mixins: [HandlesValidationErrors, DependentFormField],
 
     props: [
@@ -123,6 +133,7 @@ export default {
         selectedOption: null,
         value: null,
         selectOptionsOpen: false,
+        loading: false,
     }),
 
     created() {
@@ -164,25 +175,19 @@ export default {
         },
 
         updateValue(option) {
+            this.loading = true;
             /** Set the new option for displaying */
             this.selectedOption = option;
 
             /** Close the option box */
             this.selectOptionsOpen = false;
 
-            /** Do the update! */
-            // console.log(option.value);
-            // console.log(this.field.attribute);
-            // console.log(this.resourceId);
-            // console.log(this.resource);
-
             this.emitFieldValueChange(this.field.attribute, option.value);
             this.submit(option.value);
-
-            // "index", "resource", "resourceName", "resourceId", "field"
         },
 
         async submit(value) {
+            let self = this;
             let formData = new FormData();
 
             formData.append(this.field.attribute, value);
@@ -210,6 +215,7 @@ export default {
                 )
                 .finally(() => {
                     // this.showUpdateButton = false;
+                    self.loading = false;
                 });
         },
 
