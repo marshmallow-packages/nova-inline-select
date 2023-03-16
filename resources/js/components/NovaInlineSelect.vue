@@ -72,7 +72,7 @@
                             ]"
                             class="mm-ml-3 mm-block mm-truncate"
                         >
-                            {{ value.label }} ({{ value.value }})
+                            {{ value.label }}
                         </span>
                     </div>
                     <span
