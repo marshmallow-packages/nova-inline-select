@@ -1,6 +1,6 @@
 <template>
     <div class="mm-nova-inline-selector">
-        <div class="mm-relative mm-mt-2">
+        <div class="mm-relative">
             <button
                 :style="{ maxWidth: maxWidth }"
                 @click.prevent="toggleOptions"
