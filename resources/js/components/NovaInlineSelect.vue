@@ -24,8 +24,10 @@
                 <span v-else class="mm-flex mm-items-center">
                     <span v-if="!loading" v-html="this.field.noAvatarImage" />
                     <Loader v-if="loading" />
-                    <span v-if="showLabel" class="mm-ml-3 mm-block mm-truncate"
-                        >No option selected</span
+                    <span
+                        v-if="showLabel"
+                        class="mm-ml-3 mm-block mm-truncate"
+                        >{{ field.noOptionSelected }}</span
                     >
                 </span>
 
