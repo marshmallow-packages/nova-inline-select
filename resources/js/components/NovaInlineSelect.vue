@@ -6,7 +6,7 @@
                 :style="{ maxWidth: maxWidth }"
                 @click.prevent="toggleOptions(toggleButton)"
                 type="button"
-                class="mm-relative mm-w-full mm-cursor-pointer mm-rounded-md mm-bg-white mm-py-1.5 mm-pl-3 mm-pr-2 mm-text-left mm-text-gray-900 mm-shadow-sm mm-ring-1 mm-ring-inset mm-ring-gray-300 mm-focus:outline-none mm-focus:ring-2 mm-focus:ring-indigo-500 mm-sm:text-sm mm-sm:leading-6"
+                class="mm-relative mm-w-full mm-cursor-pointer mm-rounded-md mm-bg-white mm-py-1.5 mm-pl-3 mm-pr-2 mm-text-left mm-text-gray-900 mm-shadow-sm mm-ring-1 mm-ring-inset mm-ring-gray-300 mm-focus:outline-none mm-focus:ring-2 mm-focus:ring-indigo-500 mm-sm:text-sm mm-sm:leading-6 hover:mm-bg-gray-50"
                 aria-haspopup="listbox"
                 aria-expanded="true"
                 aria-labelledby="listbox-label"
