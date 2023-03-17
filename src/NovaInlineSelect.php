@@ -26,6 +26,7 @@ class NovaInlineSelect extends Select
     {
         parent::__construct(...func_get_args());
         $this->withMeta([
+            'useImages' => false,
             'showLabelOnIndex' => true,
             'showLabelOnDetail' => true,
             'showArrowsOnIndex' => true,

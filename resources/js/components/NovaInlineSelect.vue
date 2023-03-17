@@ -13,7 +13,7 @@
             >
                 <span v-if="selectedOption" class="mm-flex mm-items-center">
                     <span
-                        v-if="!loading"
+                        v-if="!loading && this.field.useImages"
                         v-html="this.getOptionAvatar(selectedOption.value)"
                     />
                     <Loader v-if="loading" />
@@ -22,7 +22,10 @@
                     </span>
                 </span>
                 <span v-else class="mm-flex mm-items-center">
-                    <span v-if="!loading" v-html="this.field.noAvatarImage" />
+                    <span
+                        v-if="!loading && this.field.useImages"
+                        v-html="this.field.noAvatarImage"
+                    />
                     <Loader v-if="loading" />
                     <span
                         v-if="showLabel"
@@ -75,7 +78,10 @@
                     role="option"
                 >
                     <div class="mm-flex mm-items-center">
-                        <span v-html="this.getOptionAvatar(value.value)" />
+                        <span
+                            v-if="this.field.useImages"
+                            v-html="this.getOptionAvatar(value.value)"
+                        />
                         <span
                             :class="[
                                 this.isCurrentlySelected(value.value)
