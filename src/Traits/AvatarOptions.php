@@ -10,6 +10,7 @@ trait AvatarOptions
             return '<img src="' . $image_path . '" class="mm-h-5 mm-w-5 mm-flex-shrink-0 mm-rounded-full"/>';
         })->toArray();
         return $this->withMeta([
+            'useImages' => true,
             'avatarImages' => $images,
         ]);
     }
@@ -25,6 +26,7 @@ trait AvatarOptions
     {
         $images = is_callable($images) ? $images() : $images;
         return $this->withMeta([
+            'useImages' => true,
             'avatarImages' => $images,
         ]);
     }
