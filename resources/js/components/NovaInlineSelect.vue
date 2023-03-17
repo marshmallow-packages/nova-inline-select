@@ -2,8 +2,9 @@
     <div class="mm-nova-inline-selector">
         <div class="mm-relative">
             <button
+                ref="toggleButton"
                 :style="{ maxWidth: maxWidth }"
-                @click.prevent="toggleOptions"
+                @click.prevent="toggleOptions(toggleButton)"
                 type="button"
                 class="mm-relative mm-w-full mm-cursor-pointer mm-rounded-md mm-bg-white mm-py-1.5 mm-pl-3 mm-pr-2 mm-text-left mm-text-gray-900 mm-shadow-sm mm-ring-1 mm-ring-inset mm-ring-gray-300 mm-focus:outline-none mm-focus:ring-2 mm-focus:ring-indigo-500 mm-sm:text-sm mm-sm:leading-6"
                 aria-haspopup="listbox"
@@ -48,6 +49,10 @@
             </button>
             <ul
                 :class="[selectOptionsOpen ? 'mm-visable' : 'mm-hidden']"
+                :style="{
+                    left: selectOptionsPosition.left,
+                    top: selectOptionsPosition.top,
+                }"
                 class="mm-fixed mm-z-10 mm-mt-1 mm-max-h-56 mm-w-full mm-overflow-auto mm-rounded-md mm-bg-white mm-py-1 mm-text-base mm-shadow-lg mm-ring-1 mm-ring-black mm-ring-opacity-5 mm-focus:outline-none mm-sm:text-sm mm-max-w-[400px]"
                 tabindex="-1"
                 role="listbox"
@@ -104,246 +109,287 @@
 </template>
 
 <script>
-import Loader from "./Loader.vue";
-import find from "lodash/find";
-// import first from 'lodash/first'
-import isNil from "lodash/isNil";
-import { DependentFormField, HandlesValidationErrors } from "laravel-nova";
+    import Loader from "./Loader.vue";
+    import find from "lodash/find";
+    // import first from 'lodash/first'
+    import isNil from "lodash/isNil";
+    import { DependentFormField, HandlesValidationErrors } from "laravel-nova";
 
-export default {
-    components: {
-        Loader,
-    },
+    export default {
+        components: {
+            Loader,
+        },
 
-    mixins: [HandlesValidationErrors, DependentFormField],
+        mixins: [HandlesValidationErrors, DependentFormField],
 
-    props: [
-        "index",
-        "resource",
-        "resourceName",
-        "resourceId",
-        "field",
-        "showLabel",
-        "maxWidth",
-        "showArrows",
-    ],
+        props: [
+            "index",
+            "resource",
+            "resourceName",
+            "resourceId",
+            "field",
+            "showLabel",
+            "maxWidth",
+            "showArrows",
+        ],
 
-    data: () => ({
-        search: "",
-        selectedOption: null,
-        value: null,
-        selectOptionsOpen: false,
-        loading: false,
-    }),
+        data: () => ({
+            search: "",
+            selectedOption: null,
+            value: null,
+            selectOptionsOpen: false,
+            selectOptionsPosition: {},
+            loading: false,
+        }),
 
-    created() {
-        /** Add this listener to close the drop down when clicking outside. */
-        window.addEventListener("click", (e) => {
-            if (
-                !this.$parent.$el.querySelector(".mm-nova-inline-selector") ||
-                !this.$parent.$el
-                    .querySelector(".mm-nova-inline-selector")
-                    .contains(e.target)
-            ) {
+        created() {
+            /** Add this listener to close the drop down when clicking outside. */
+            window.addEventListener("click", (e) => {
+                if (
+                    !this.$parent.$el.querySelector(
+                        ".mm-nova-inline-selector"
+                    ) ||
+                    !this.$parent.$el
+                        .querySelector(".mm-nova-inline-selector")
+                        .contains(e.target)
+                ) {
+                    this.selectOptionsOpen = false;
+                }
+            });
+
+            window.addEventListener("scroll", (e) => {
                 this.selectOptionsOpen = false;
-            }
-        });
-
-        let value = this.field.value ?? "";
-
-        let self = this;
-        Nova.$on("should-close-all-nova-inline-select", function () {
-            self.selectOptionsOpen = false;
-        });
-
-        let selectedOption = find(this.field.options, (v) => v.value == value);
-
-        if (selectedOption) {
-            this.$nextTick(() => {
-                this.selectOption(selectedOption);
             });
-        }
-    },
 
-    methods: {
-        toggleOptions() {
-            let was_open = this.selectOptionsOpen;
-            let new_status = !this.selectOptionsOpen;
-            Nova.$emit("should-close-all-nova-inline-select");
+            let value = this.field.value ?? "";
 
-            this.selectOptionsOpen = new_status;
-        },
-
-        updateValue(option) {
-            this.loading = true;
-            /** Set the new option for displaying */
-            this.selectedOption = option;
-
-            /** Close the option box */
-            this.selectOptionsOpen = false;
-
-            this.emitFieldValueChange(this.field.attribute, option.value);
-            this.submit(option.value);
-        },
-
-        async submit(value) {
             let self = this;
-            let formData = new FormData();
-
-            formData.append(this.field.attribute, value);
-            formData.append("_method", "PUT");
-
-            return Nova.request()
-                .post(
-                    `/nova-api/${this.resourceName}/${this.resourceId}`,
-                    formData
-                )
-                .then(
-                    () => {
-                        let label = find(
-                            this.field.options,
-                            (option) => option.value === value
-                        ).label;
-
-                        Nova.success(
-                            `${this.field.name} updated to "${label}"`
-                        );
-                    },
-                    (response) => {
-                        Nova.error(response);
-                    }
-                )
-                .finally(() => {
-                    // this.showUpdateButton = false;
-                    self.loading = false;
-                });
-        },
-
-        /** Check if the value is the same as the currently selected option. */
-        isCurrentlySelected(value) {
-            if (this.selectedOption && this.selectedOption.value) {
-                return this.selectedOption.value === value;
-            }
-            return false;
-        },
-
-        getOptionAvatar(value) {
-            let avatar = find(this.field.avatarImages, function (v, k) {
-                return k == value;
+            Nova.$on("should-close-all-nova-inline-select", function () {
+                self.selectOptionsOpen = false;
             });
 
-            if (avatar) {
-                return avatar;
-            }
-
-            return this.field.noAvatarImage;
-        },
-
-        /**
-         * Provide a function that fills a passed FormData object with the
-         * field's internal value attribute. Here we are forcing there to be a
-         * value sent to the server instead of the default behavior of
-         * `this.value || ''` to avoid loose-comparison issues if the keys
-         * are truthy or falsey
-         */
-        // fill(formData) {
-        //     this.fillIfVisible(
-        //         formData,
-        //         this.field.attribute,
-        //         this.value ?? ""
-        //     );
-        // },
-
-        /**
-         * Set the search string to be used to filter the select field.
-         */
-        // performSearch(event) {
-        //     this.search = event;
-        // },
-
-        /**
-         * Clear the current selection for the field.
-         */
-        // clearSelection() {
-        //     this.selectedOption = "";
-        //     this.value = "";
-
-        //     if (this.field) {
-        //         this.emitFieldValueChange(this.field.attribute, this.value);
-        //     }
-        // },
-
-        /**
-         * Select the given option.
-         */
-        selectOption(option) {
-            if (isNil(option)) {
-                this.clearSelection();
-                return;
-            }
-
-            this.selectedOption = option;
-            this.value = option.value;
-
-            if (this.field) {
-                this.emitFieldValueChange(this.field.attribute, this.value);
-            }
-        },
-
-        /**
-         * Handle the selection change event.
-         */
-        handleChange(value) {
             let selectedOption = find(
-                this.currentField.options,
+                this.field.options,
                 (v) => v.value == value
             );
 
-            this.selectOption(selectedOption);
+            if (selectedOption) {
+                this.$nextTick(() => {
+                    this.selectOption(selectedOption);
+                });
+            }
         },
 
-        /**
-         * Handle on synced field.
-         */
-        // onSyncedField() {
-        //     let currentSelectedOption = null;
-        //     let hasValue = false;
+        methods: {
+            toggleOptions(toggleButton) {
+                /** Get the position of the clicked butto because we need options list has a fixed position. */
+                const left =
+                    this.$refs.toggleButton.getBoundingClientRect().left;
+                const top = this.$refs.toggleButton.getBoundingClientRect().top;
 
-        //     if (this.selectedOption) {
-        //         hasValue = true;
-        //         currentSelectedOption = find(
-        //             this.currentField.options,
-        //             (v) => v.value == this.selectedOption.value
-        //         );
-        //     }
+                /** Get the new status for the option list. */
+                let new_status = !this.selectOptionsOpen;
 
-        //     let selectedOption = find(
-        //         this.currentField.options,
-        //         (v) => v.value == this.currentField.value
-        //     );
+                /** Make sure all open options lists are closed when we open a new one. */
+                Nova.$emit("should-close-all-nova-inline-select");
 
-        //     if (isNil(currentSelectedOption)) {
-        //         this.clearSelection();
+                /** Set the new status */
+                this.selectOptionsOpen = new_status;
 
-        //         if (this.currentField.value) {
-        //             this.selectOption(selectedOption);
-        //         } else if (hasValue && !this.currentField.nullable) {
-        //             this.selectOption(first(this.currentField.options));
-        //         }
+                /**
+                 * Caculate the size of the options list. We dont have to go over 5.3 because
+                 * the option list has a max height and will be scrollable if it has more then 5 items.
+                 * */
+                let optionsCountForOffset =
+                    this.field.options.length > 5
+                        ? 5.3
+                        : this.field.options.length;
+                let optionsContainerHeight = 44 * optionsCountForOffset;
 
-        //         return;
-        //     } else if (
-        //         currentSelectedOption &&
-        //         selectedOption &&
-        //         ["create", "attach"].includes(this.editMode)
-        //     ) {
-        //         this.selectOption(selectedOption);
+                this.selectOptionsPosition.left = left + "px";
 
-        //         return;
-        //     }
+                /**
+                 * If the position of the options list is bigger then the window height
+                 * we need to add the options list above the button.
+                 */
+                if (top + optionsContainerHeight > window.innerHeight - 30) {
+                    this.selectOptionsPosition.top =
+                        top - optionsContainerHeight + "px";
+                } else {
+                    this.selectOptionsPosition.top = top + 30 + "px";
+                }
+            },
 
-        //     this.selectOption(currentSelectedOption);
-        // },
-    },
-};
+            updateValue(option) {
+                this.loading = true;
+                /** Set the new option for displaying */
+                this.selectedOption = option;
+
+                /** Close the option box */
+                this.selectOptionsOpen = false;
+
+                this.emitFieldValueChange(this.field.attribute, option.value);
+                this.submit(option.value);
+            },
+
+            async submit(value) {
+                let self = this;
+                let formData = new FormData();
+
+                formData.append(this.field.attribute, value);
+                formData.append("_method", "PUT");
+
+                return Nova.request()
+                    .post(
+                        `/nova-api/${this.resourceName}/${this.resourceId}`,
+                        formData
+                    )
+                    .then(
+                        () => {
+                            let label = find(
+                                this.field.options,
+                                (option) => option.value === value
+                            ).label;
+
+                            Nova.success(
+                                `${this.field.name} updated to "${label}"`
+                            );
+                        },
+                        (response) => {
+                            Nova.error(response);
+                        }
+                    )
+                    .finally(() => {
+                        // this.showUpdateButton = false;
+                        self.loading = false;
+                    });
+            },
+
+            /** Check if the value is the same as the currently selected option. */
+            isCurrentlySelected(value) {
+                if (this.selectedOption && this.selectedOption.value) {
+                    return this.selectedOption.value === value;
+                }
+                return false;
+            },
+
+            getOptionAvatar(value) {
+                let avatar = find(this.field.avatarImages, function (v, k) {
+                    return k == value;
+                });
+
+                if (avatar) {
+                    return avatar;
+                }
+
+                return this.field.noAvatarImage;
+            },
+
+            /**
+             * Provide a function that fills a passed FormData object with the
+             * field's internal value attribute. Here we are forcing there to be a
+             * value sent to the server instead of the default behavior of
+             * `this.value || ''` to avoid loose-comparison issues if the keys
+             * are truthy or falsey
+             */
+            // fill(formData) {
+            //     this.fillIfVisible(
+            //         formData,
+            //         this.field.attribute,
+            //         this.value ?? ""
+            //     );
+            // },
+
+            /**
+             * Set the search string to be used to filter the select field.
+             */
+            // performSearch(event) {
+            //     this.search = event;
+            // },
+
+            /**
+             * Clear the current selection for the field.
+             */
+            // clearSelection() {
+            //     this.selectedOption = "";
+            //     this.value = "";
+
+            //     if (this.field) {
+            //         this.emitFieldValueChange(this.field.attribute, this.value);
+            //     }
+            // },
+
+            /**
+             * Select the given option.
+             */
+            selectOption(option) {
+                if (isNil(option)) {
+                    this.clearSelection();
+                    return;
+                }
+
+                this.selectedOption = option;
+                this.value = option.value;
+
+                if (this.field) {
+                    this.emitFieldValueChange(this.field.attribute, this.value);
+                }
+            },
+
+            /**
+             * Handle the selection change event.
+             */
+            handleChange(value) {
+                let selectedOption = find(
+                    this.currentField.options,
+                    (v) => v.value == value
+                );
+
+                this.selectOption(selectedOption);
+            },
+
+            /**
+             * Handle on synced field.
+             */
+            // onSyncedField() {
+            //     let currentSelectedOption = null;
+            //     let hasValue = false;
+
+            //     if (this.selectedOption) {
+            //         hasValue = true;
+            //         currentSelectedOption = find(
+            //             this.currentField.options,
+            //             (v) => v.value == this.selectedOption.value
+            //         );
+            //     }
+
+            //     let selectedOption = find(
+            //         this.currentField.options,
+            //         (v) => v.value == this.currentField.value
+            //     );
+
+            //     if (isNil(currentSelectedOption)) {
+            //         this.clearSelection();
+
+            //         if (this.currentField.value) {
+            //             this.selectOption(selectedOption);
+            //         } else if (hasValue && !this.currentField.nullable) {
+            //             this.selectOption(first(this.currentField.options));
+            //         }
+
+            //         return;
+            //     } else if (
+            //         currentSelectedOption &&
+            //         selectedOption &&
+            //         ["create", "attach"].includes(this.editMode)
+            //     ) {
+            //         this.selectOption(selectedOption);
+
+            //         return;
+            //     }
+
+            //     this.selectOption(currentSelectedOption);
+            // },
+        },
+    };
 </script>
