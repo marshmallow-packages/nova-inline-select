@@ -244,12 +244,13 @@
                 let self = this;
                 let formData = new FormData();
 
+                formData.append("attribute", this.field.attribute);
                 formData.append(this.field.attribute, value);
                 formData.append("_method", "PUT");
 
                 return Nova.request()
                     .post(
-                        `/nova-api/${this.resourceName}/${this.resourceId}`,
+                        `/nova-vendor/nova-inline-select/${this.resourceName}/${this.resourceId}`,
                         formData
                     )
                     .then(
