@@ -11,13 +11,16 @@
                 aria-expanded="true"
                 aria-labelledby="listbox-label"
             >
-                <span v-if="selectedOption" class="mm-flex mm-items-center">
+                <span
+                    v-if="selectedOption"
+                    class="mm-flex mm-items-center mm-gap-3"
+                >
                     <span
                         v-if="!loading && this.field.useImages"
                         v-html="this.getOptionAvatar(selectedOption.value)"
                     />
-                    <Loader v-if="loading" />
-                    <span v-if="showLabel" class="mm-ml-3 mm-block mm-truncate">
+                    <Loader v-if="loading && this.live" />
+                    <span v-if="showLabel" class="mm-block mm-truncate">
                         {{ selectedOption.label }}
                     </span>
                 </span>
@@ -139,6 +142,7 @@
             "showLabel",
             "maxWidth",
             "showArrows",
+            "live",
         ],
 
         data: () => ({
@@ -237,7 +241,14 @@
                 this.selectOptionsOpen = false;
 
                 this.emitFieldValueChange(this.field.attribute, option.value);
-                this.submit(option.value);
+
+                if (this.live) {
+                    this.submit(option.value);
+                } else {
+                    Nova.$emit("novaInlineSelectSetFormFieldValue", {
+                        value: option.value,
+                    });
+                }
             },
 
             async submit(value) {

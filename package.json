@@ -11,14 +11,11 @@
         "nova:install": "npm --prefix='../../vendor/laravel/nova' ci"
     },
     "devDependencies": {
-        "@vue/compiler-sfc": "^3.2.22",
-        "form-backend-validation": "^2.3.3",
-        "laravel-mix": "^6.0.41",
-        "lodash": "^4.17.21",
-        "postcss": "^8.3.11",
-        "vue-loader": "^16.8.3"
+        "@tailwindcss/forms": "^0.5.7",
+        "@tailwindcss/typography": "^0.5.10",
+        "laravel-nova-devtool": "file:vendor/laravel/nova-devtool",
+        "mix-tailwindcss": "^1.3.0",
+        "tailwindcss": "^3.3.6"
     },
-    "dependencies": {
-        "tailwindcss": "^3.1.8"
-    }
+    "dependencies": {}
 }
