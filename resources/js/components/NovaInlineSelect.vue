@@ -241,6 +241,10 @@
                 this.selectOptionsOpen = false;
 
                 this.emitFieldValueChange(this.field.attribute, option.value);
+                Nova.$emit(
+                    this.field.attribute + "-new-value-selected",
+                    option.value
+                );
 
                 if (this.live) {
                     this.submit(option.value);
