@@ -8,16 +8,17 @@
         :maxWidth="this.field.maxWidthOnIndex"
         :showArrows="this.field.showArrowsOnIndex"
         :field="field"
+        :live="true"
     />
 </template>
 
 <script>
-import NovaInlineSelect from "./NovaInlineSelect.vue";
-export default {
-    components: {
-        NovaInlineSelect,
-    },
+    import NovaInlineSelect from "./NovaInlineSelect.vue";
+    export default {
+        components: {
+            NovaInlineSelect,
+        },
 
-    props: ["index", "resource", "resourceName", "resourceId", "field"],
-};
+        props: ["index", "resource", "resourceName", "resourceId", "field"],
+    };
 </script>
