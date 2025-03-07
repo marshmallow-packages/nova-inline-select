@@ -4,7 +4,6 @@
 
 [![Version](https://img.shields.io/packagist/v/marshmallow/nova-inline-select)](https://github.com/marshmallow-packages/nova-inline-select)
 [![Issues](https://img.shields.io/github/issues/marshmallow-packages/nova-inline-select)](https://github.com/marshmallow-packages/nova-inline-select)
-[![Code Coverage](https://img.shields.io/badge/coverage-100%25-success)](https://github.com/marshmallow-packages/nova-inline-select)
 [![Licence](https://img.shields.io/github/license/marshmallow-packages/nova-inline-select)](https://github.com/marshmallow-packages/nova-inline-select)
 
 This package gives you the possibility to create an inline select field in Laraval Nova. This is build to make quick changes to your resource from the index or detail view. On forms it will just show you a normal select.
