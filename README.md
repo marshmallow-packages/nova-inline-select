@@ -2,18 +2,19 @@
 
 # Nova Inline Select
 
-[![Version](https://img.shields.io/packagist/v/marshmallow/nova-inline-select)](https://github.com/marshmallow-packages/nova-inline-select)
-[![Issues](https://img.shields.io/github/issues/marshmallow-packages/nova-inline-select)](https://github.com/marshmallow-packages/nova-inline-select)
-[![Licence](https://img.shields.io/github/license/marshmallow-packages/nova-inline-select)](https://github.com/marshmallow-packages/nova-inline-select)
+[![Version](https://img.shields.io/packagist/v/marshmallow/nova-inline-select)](https://packagist.org/packages/marshmallow/nova-inline-select)
+[![Total Downloads](https://img.shields.io/packagist/dt/marshmallow/nova-inline-select)](https://packagist.org/packages/marshmallow/nova-inline-select)
+[![Issues](https://img.shields.io/github/issues/marshmallow-packages/nova-inline-select)](https://github.com/marshmallow-packages/nova-inline-select/issues)
+[![Licence](https://img.shields.io/github/license/marshmallow-packages/nova-inline-select)](https://github.com/marshmallow-packages/nova-inline-select/blob/main/LICENSE.md)
 
-This package gives you the possibility to create an inline select field in Laraval Nova. This is build to make quick changes to your resource from the index or detail view. On forms it will just show you a normal select.
+This package gives you the possibility to create an inline select field in Laravel Nova. This is built to make quick changes to your resource from the index or detail view. On forms it will just show you a normal select.
 
 ![alt text](resources/screenshots/preview.png "Package preview.")
 
 ## Requirements
 
--   `php: >=8.1`
--   `laravel/nova: ^4.0`
+-   `php: ^8.1`
+-   `laravel/nova: ^5.0`
 
 ## Installation
 
@@ -143,6 +144,10 @@ Text::make('Email')
     ->rules('required', 'email')
     ->updateRules('sometimes'),
 ```
+
+## Security
+
+If you discover any security-related issues, please email security@marshmallow.dev instead of using the issue tracker.
 
 ## Credits
 
